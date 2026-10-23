@@ -1,0 +1,32 @@
+{
+  "cliente1": {
+    "tours": [
+      {
+        "id": "demo-tour-ilha-do-mel",
+        "route": "Paranaguá → Ilha do Mel",
+        "departure": "09:30",
+        "capacity": 14,
+        "price": "R$ 280,00",
+        "daysOfWeek": [0, 6]
+      },
+      {
+        "id": "demo-tour-praia-de-fora",
+        "route": "Ilha do Mel → Praia de Fora",
+        "departure": "13:00",
+        "capacity": 14,
+        "price": "R$ 190,00",
+        "daysOfWeek": [0, 6]
+      }
+    ],
+    "special": [
+      {
+        "id": "demo-special-por-do-sol",
+        "daysFromToday": 3,
+        "route": "Paranaguá → Ilha do Mel",
+        "departure": "17:00",
+        "capacity": 14,
+        "price": "R$ 320,00"
+      }
+    ]
+  }
+}

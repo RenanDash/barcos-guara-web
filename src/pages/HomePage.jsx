@@ -31,8 +31,8 @@ function HomePage() {
               </p>
 
               <div className="cta-row">
-                <Link className="button button--primary" to="/cliente1">
-                  Ver agendamento
+                <Link className="button button--primary" to="/login">
+                  Gerenciamento
                 </Link>
                 <a className="button button--secondary" href="#clientes">
                   Clientes

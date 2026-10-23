@@ -1,0 +1,161 @@
+{
+  "cliente1": {
+    "period": "Setembro de 2026",
+    "summary": {
+      "grossRevenue": 42680,
+      "operatingExpenses": 18940,
+      "netProfit": 23740,
+      "completedTrips": 186,
+      "reservations": 194,
+      "averageTicket": 229.46,
+      "occupancyRate": 74
+    },
+    "monthlyTrend": [
+      { "month": "Jun", "grossRevenue": 31800, "operatingExpenses": 15100, "netProfit": 16700, "completedTrips": 142 },
+      { "month": "Jul", "grossRevenue": 36400, "operatingExpenses": 16600, "netProfit": 19800, "completedTrips": 158 },
+      { "month": "Ago", "grossRevenue": 38950, "operatingExpenses": 17820, "netProfit": 21130, "completedTrips": 171 },
+      { "month": "Set", "grossRevenue": 42680, "operatingExpenses": 18940, "netProfit": 23740, "completedTrips": 186 }
+    ],
+    "expenses": [
+      { "category": "Combustível", "amount": 10420 },
+      { "category": "Manutenção", "amount": 4280 },
+      { "category": "Taxas e tarifas", "amount": 2360 },
+      { "category": "Outros custos operacionais", "amount": 1880 }
+    ],
+    "tripTypes": [
+      { "category": "Horários fixos", "reservations": 110, "revenue": 24800 },
+      { "category": "Passeios", "reservations": 48, "revenue": 11880 },
+      { "category": "Datas especiais", "reservations": 28, "revenue": 6000 }
+    ],
+    "topRoutes": [
+      { "origin": "Guara", "destination": "Paranaguá", "trips": 64, "revenue": 14400 },
+      { "origin": "Paranaguá", "destination": "Guara", "trips": 46, "revenue": 10400 },
+      { "origin": "Praia da Costa", "destination": "Porto", "trips": 39, "revenue": 9360 },
+      { "origin": "Porto", "destination": "Praia da Costa", "trips": 37, "revenue": 8520 }
+    ],
+    "reservationStatus": [
+      { "status": "Concluídas", "count": 186 },
+      { "status": "Canceladas", "count": 5 },
+      { "status": "Aguardando confirmação", "count": 3 }
+    ],
+    "insight": "O lucro líquido cresceu 12,3% em relação a agosto. Combustível representa 55% dos custos operacionais; as rotas entre Guara e Paranaguá concentram a maior receita.",
+    "currentMonthToDate": {
+      "period": "Outubro de 2026, até o dia 23",
+      "netProfit": 23740
+    },
+    "daily": [
+      { "date": "2026-10-01", "grossRevenue": 6200, "operatingExpenses": 2750, "completedTrips": 26, "reservations": 27, "occupancyRate": 70 },
+      { "date": "2026-10-05", "grossRevenue": 6800, "operatingExpenses": 3000, "completedTrips": 29, "reservations": 30, "occupancyRate": 72 },
+      { "date": "2026-10-10", "grossRevenue": 7100, "operatingExpenses": 3150, "completedTrips": 31, "reservations": 32, "occupancyRate": 74 },
+      { "date": "2026-10-15", "grossRevenue": 7200, "operatingExpenses": 3200, "completedTrips": 32, "reservations": 33, "occupancyRate": 75 },
+      { "date": "2026-10-20", "grossRevenue": 7400, "operatingExpenses": 3280, "completedTrips": 33, "reservations": 34, "occupancyRate": 76 },
+      { "date": "2026-10-23", "grossRevenue": 7980, "operatingExpenses": 3560, "completedTrips": 35, "reservations": 38, "occupancyRate": 77 }
+    ]
+  },
+  "cliente2": {
+    "period": "Setembro de 2026",
+    "summary": {
+      "grossRevenue": 31840,
+      "operatingExpenses": 14260,
+      "netProfit": 17580,
+      "completedTrips": 148,
+      "reservations": 154,
+      "averageTicket": 215.14,
+      "occupancyRate": 71
+    },
+    "monthlyTrend": [
+      { "month": "Jun", "grossRevenue": 24600, "operatingExpenses": 11900, "netProfit": 12700, "completedTrips": 117 },
+      { "month": "Jul", "grossRevenue": 27800, "operatingExpenses": 12800, "netProfit": 15000, "completedTrips": 129 },
+      { "month": "Ago", "grossRevenue": 29400, "operatingExpenses": 13500, "netProfit": 15900, "completedTrips": 136 },
+      { "month": "Set", "grossRevenue": 31840, "operatingExpenses": 14260, "netProfit": 17580, "completedTrips": 148 }
+    ],
+    "expenses": [
+      { "category": "Combustível", "amount": 7840 },
+      { "category": "Manutenção", "amount": 3250 },
+      { "category": "Taxas e tarifas", "amount": 1740 },
+      { "category": "Outros custos operacionais", "amount": 1430 }
+    ],
+    "tripTypes": [
+      { "category": "Horários fixos", "reservations": 88, "revenue": 18600 },
+      { "category": "Passeios", "reservations": 39, "revenue": 8840 },
+      { "category": "Datas especiais", "reservations": 21, "revenue": 4400 }
+    ],
+    "topRoutes": [
+      { "origin": "Praia da Costa", "destination": "Porto", "trips": 52, "revenue": 11440 },
+      { "origin": "Porto", "destination": "Praia da Costa", "trips": 44, "revenue": 9680 },
+      { "origin": "Ilha do Mel", "destination": "Paranaguá", "trips": 29, "revenue": 6380 },
+      { "origin": "Paranaguá", "destination": "Ilha do Mel", "trips": 23, "revenue": 4340 }
+    ],
+    "reservationStatus": [
+      { "status": "Concluídas", "count": 148 },
+      { "status": "Canceladas", "count": 4 },
+      { "status": "Aguardando confirmação", "count": 2 }
+    ],
+    "insight": "O lucro líquido cresceu 10,6% em relação a agosto. Combustível representa 55% dos custos operacionais; a rota Praia da Costa–Porto lidera a receita.",
+    "currentMonthToDate": {
+      "period": "Outubro de 2026, até o dia 23",
+      "netProfit": 17580
+    },
+    "daily": [
+      { "date": "2026-10-01", "grossRevenue": 4700, "operatingExpenses": 2100, "completedTrips": 22, "reservations": 23, "occupancyRate": 67 },
+      { "date": "2026-10-05", "grossRevenue": 4900, "operatingExpenses": 2200, "completedTrips": 23, "reservations": 24, "occupancyRate": 69 },
+      { "date": "2026-10-10", "grossRevenue": 5200, "operatingExpenses": 2320, "completedTrips": 24, "reservations": 25, "occupancyRate": 71 },
+      { "date": "2026-10-15", "grossRevenue": 5300, "operatingExpenses": 2380, "completedTrips": 25, "reservations": 26, "occupancyRate": 72 },
+      { "date": "2026-10-20", "grossRevenue": 5600, "operatingExpenses": 2500, "completedTrips": 26, "reservations": 27, "occupancyRate": 74 },
+      { "date": "2026-10-23", "grossRevenue": 6140, "operatingExpenses": 2760, "completedTrips": 28, "reservations": 29, "occupancyRate": 76 }
+    ]
+  },
+  "cliente3": {
+    "period": "Setembro de 2026",
+    "summary": {
+      "grossRevenue": 27600,
+      "operatingExpenses": 12600,
+      "netProfit": 15000,
+      "completedTrips": 120,
+      "reservations": 126,
+      "averageTicket": 230,
+      "occupancyRate": 68
+    },
+    "monthlyTrend": [
+      { "month": "Jun", "grossRevenue": 20500, "operatingExpenses": 10100, "netProfit": 10400, "completedTrips": 91 },
+      { "month": "Jul", "grossRevenue": 23200, "operatingExpenses": 11000, "netProfit": 12200, "completedTrips": 101 },
+      { "month": "Ago", "grossRevenue": 24900, "operatingExpenses": 11700, "netProfit": 13200, "completedTrips": 109 },
+      { "month": "Set", "grossRevenue": 27600, "operatingExpenses": 12600, "netProfit": 15000, "completedTrips": 120 }
+    ],
+    "expenses": [
+      { "category": "Combustível", "amount": 6930 },
+      { "category": "Manutenção", "amount": 2810 },
+      { "category": "Taxas e tarifas", "amount": 1540 },
+      { "category": "Outros custos operacionais", "amount": 1320 }
+    ],
+    "tripTypes": [
+      { "category": "Horários fixos", "reservations": 62, "revenue": 13900 },
+      { "category": "Passeios", "reservations": 42, "revenue": 9700 },
+      { "category": "Datas especiais", "reservations": 16, "revenue": 4000 }
+    ],
+    "topRoutes": [
+      { "origin": "Ponto Central", "destination": "Praia", "trips": 45, "revenue": 10350 },
+      { "origin": "Praia", "destination": "Ponto Central", "trips": 38, "revenue": 8740 },
+      { "origin": "Costa Oeste", "destination": "Ilha", "trips": 21, "revenue": 4830 },
+      { "origin": "Ilha", "destination": "Costa Oeste", "trips": 16, "revenue": 3680 }
+    ],
+    "reservationStatus": [
+      { "status": "Concluídas", "count": 120 },
+      { "status": "Canceladas", "count": 4 },
+      { "status": "Aguardando confirmação", "count": 2 }
+    ],
+    "insight": "O lucro líquido cresceu 13,6% em relação a agosto. Passeios turísticos representam 35% da receita e têm espaço para crescer com mais opções de horário.",
+    "currentMonthToDate": {
+      "period": "Outubro de 2026, até o dia 23",
+      "netProfit": 15000
+    },
+    "daily": [
+      { "date": "2026-10-01", "grossRevenue": 3800, "operatingExpenses": 1700, "completedTrips": 16, "reservations": 17, "occupancyRate": 61 },
+      { "date": "2026-10-05", "grossRevenue": 4200, "operatingExpenses": 1900, "completedTrips": 18, "reservations": 19, "occupancyRate": 64 },
+      { "date": "2026-10-10", "grossRevenue": 4500, "operatingExpenses": 2050, "completedTrips": 19, "reservations": 20, "occupancyRate": 66 },
+      { "date": "2026-10-15", "grossRevenue": 4700, "operatingExpenses": 2150, "completedTrips": 20, "reservations": 21, "occupancyRate": 68 },
+      { "date": "2026-10-20", "grossRevenue": 5000, "operatingExpenses": 2250, "completedTrips": 22, "reservations": 23, "occupancyRate": 70 },
+      { "date": "2026-10-23", "grossRevenue": 5400, "operatingExpenses": 2550, "completedTrips": 25, "reservations": 26, "occupancyRate": 72 }
+    ]
+  }
+}
