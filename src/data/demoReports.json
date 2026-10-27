@@ -28,8 +28,8 @@
       { "category": "Datas especiais", "reservations": 28, "revenue": 6000 }
     ],
     "topRoutes": [
-      { "origin": "Guara", "destination": "Paranaguá", "trips": 64, "revenue": 14400 },
-      { "origin": "Paranaguá", "destination": "Guara", "trips": 46, "revenue": 10400 },
+      { "origin": "Guará", "destination": "Paranaguá", "trips": 64, "revenue": 14400 },
+      { "origin": "Paranaguá", "destination": "Guará", "trips": 46, "revenue": 10400 },
       { "origin": "Praia da Costa", "destination": "Porto", "trips": 39, "revenue": 9360 },
       { "origin": "Porto", "destination": "Praia da Costa", "trips": 37, "revenue": 8520 }
     ],
@@ -38,7 +38,7 @@
       { "status": "Canceladas", "count": 5 },
       { "status": "Aguardando confirmação", "count": 3 }
     ],
-    "insight": "O lucro líquido cresceu 12,3% em relação a agosto. Combustível representa 55% dos custos operacionais; as rotas entre Guara e Paranaguá concentram a maior receita.",
+    "insight": "O lucro líquido cresceu 12,3% em relação a agosto. O combustível representa 55% dos custos operacionais, e as rotas entre Guará e Paranaguá concentram a maior receita.",
     "currentMonthToDate": {
       "period": "Outubro de 2026, até o dia 23",
       "netProfit": 23740

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { getScheduleConfig, getTripsForDate } from '../data/scheduleStorage';
+import { getPublicScheduleConfig, getTripsForDate } from '../data/scheduleStorage';
+import { addBooking } from '../data/bookingStorage';
 
 function formatDate(date) {
   return new Intl.DateTimeFormat('pt-BR', {
@@ -15,39 +16,68 @@ function toDateInputValue(date) {
   return `${year}-${month}-${day}`;
 }
 
+function getRouteKey(route) {
+  return route.split(' → ').map((place) => place.trim().toLocaleLowerCase()).sort().join('|');
+}
+
 function ClientPage({ client }) {
   const today = new Date();
   const minDate = toDateInputValue(today);
   const maxDateValue = new Date(today);
   maxDateValue.setDate(maxDateValue.getDate() + 10);
   const maxDate = toDateInputValue(maxDateValue);
-  const [scheduleState] = useState(() => {
-    try {
-      return { config: getScheduleConfig(client), error: '' };
-    } catch (error) {
-      return { config: null, error: error.message };
-    }
-  });
+  const [scheduleState, setScheduleState] = useState({ config: null, error: '', loading: true });
 
   const [dialogStep, setDialogStep] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(() => (
-    scheduleState.config && getTripsForDate(client, minDate).length > 0 ? minDate : ''
-  ));
+  const [selectedDate, setSelectedDate] = useState('');
   const [calendarMonth, setCalendarMonth] = useState(
     () => new Date(today.getFullYear(), today.getMonth(), 1),
   );
   const [selectedTrip, setSelectedTrip] = useState(null);
+  const [selectedRouteKey, setSelectedRouteKey] = useState(null);
   const [showBookingDetails, setShowBookingDetails] = useState(false);
+  const [bookingError, setBookingError] = useState('');
   const [formData, setFormData] = useState({
     nome: '',
     telefone: '',
-    passageiros: '2',
+    passageiros: '1',
     observacao: '',
   });
-
+  const destinationCards = scheduleState.config
+    ? [...scheduleState.config.weekly, ...scheduleState.config.tours, ...scheduleState.config.special]
+      .reduce((cards, trip) => {
+        const routeKey = getRouteKey(trip.route);
+        if (!cards.some((card) => card.routeKey === routeKey)) {
+          const [originPlace, destinationPlace] = trip.route.split(' → ');
+          cards.push({
+            routeKey,
+            originPlace,
+            destinationPlace,
+          });
+        }
+        return cards;
+      }, [])
+    : [];
   const dateDialogRef = useRef(null);
   const tripsDialogRef = useRef(null);
   const bookingDialogRef = useRef(null);
+
+  useEffect(() => {
+    let active = true;
+    getPublicScheduleConfig(client)
+      .then((config) => {
+        if (!active) return;
+        setScheduleState({ config, error: '', loading: false });
+        if (getTripsForDate(config, minDate).length > 0) setSelectedDate(minDate);
+      })
+      .catch((error) => {
+        if (active) setScheduleState({ config: null, error: error.message, loading: false });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [client, minDate]);
 
   useEffect(() => {
     const dialogs = {
@@ -75,10 +105,13 @@ function ClientPage({ client }) {
 
   const handleDateSubmit = (event) => {
     event.preventDefault();
+    const tripsForDate = getTripsForDate(scheduleState.config, selectedDate);
     if (
       selectedDate >= minDate
       && selectedDate <= maxDate
-      && getTripsForDate(client, selectedDate).length > 0
+      && tripsForDate.some((trip) => (
+        selectedRouteKey === null || getRouteKey(trip.route) === selectedRouteKey
+      ))
     ) {
       setDialogStep('trips');
     }
@@ -110,17 +143,41 @@ function ClientPage({ client }) {
   const canGoToPreviousMonth = calendarMonth > minMonth;
   const canGoToNextMonth = calendarMonth < maxMonth;
   const [origin, destination] = selectedTrip?.route.split(' → ') ?? [];
-  const tripsForSelectedDate = selectedDate ? getTripsForDate(client, selectedDate) : [];
+  const maxPassengers = selectedTrip
+    ? Number(selectedTrip.capacity)
+    : client.capacity;
+  const tripsForSelectedDate = selectedDate ? getTripsForDate(scheduleState.config, selectedDate) : [];
   const tripGroups = [
     { kind: 'weekly', title: 'Horários fixos', trips: tripsForSelectedDate },
     { kind: 'tour', title: 'Passeios', trips: tripsForSelectedDate },
-    { kind: 'special', title: 'Viagens especiais', trips: tripsForSelectedDate },
+    { kind: 'special', title: 'Datas especiais', trips: tripsForSelectedDate },
   ];
+  const hasTripsForSelectedDate = tripsForSelectedDate.some((trip) => (
+    selectedRouteKey === null || getRouteKey(trip.route) === selectedRouteKey
+  ));
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    alert('Reserva simulada com sucesso! O pagamento por Pix será enviado em seguida.');
-    setDialogStep(null);
+    setBookingError('');
+
+    try {
+      await addBooking(client.slug, {
+        date: selectedDate,
+        tripId: selectedTrip.tripId,
+        kind: selectedTrip.kind,
+        route: selectedTrip.route,
+        departure: selectedTrip.departure,
+        price: selectedTrip.price,
+        nome: formData.nome.trim(),
+        telefone: formData.telefone.trim(),
+        passageiros: Number(formData.passageiros),
+        observacao: formData.observacao.trim(),
+      });
+      alert('Reserva registrada com sucesso! O pagamento por Pix ainda deve ser combinado.');
+      setDialogStep(null);
+    } catch (error) {
+      setBookingError(`Não foi possível registrar a reserva: ${error.message}`);
+    }
   };
 
   const handleDialogCancel = (event) => {
@@ -133,36 +190,43 @@ function ClientPage({ client }) {
       <header className="topbar">
         <div className="container topbar__inner">
           <div className="brand">
-            <div className="brand__mark">⚓</div>
-            <span>Barcos Guara</span>
+            <div className="brand__mark">⚓︎</div>
+            <span>Táxi Náutico</span>
           </div>
         </div>
       </header>
 
       <main className="container client-page">
-        <section className="client-page__hero">
-          <div
-            className="client-page__banner"
-            style={{ backgroundImage: `url('${client.image}')` }}
-          >
-            <div className="client-page__banner-text">
-              <span>{client.city}</span>
-              <h1>{client.title}</h1>
-            </div>
-            <button
-              className="booking-cta"
-              type="button"
-              onClick={() => setDialogStep('date')}
-              disabled={!scheduleState.config}
+        <section className="destination-grid" aria-label={`Viagens disponíveis para ${client.name}`}>
+          {scheduleState.error && (
+            <p className="schedule-error" role="alert">
+              Não foi possível carregar os horários: {scheduleState.error}
+            </p>
+          )}
+          {scheduleState.loading && <p className="schedule-error">Carregando horários...</p>}
+          {destinationCards.map((card) => (
+            <article
+              className="destination-card"
+              key={card.routeKey}
+              style={{ backgroundImage: `url('${client.image}')` }}
             >
-              Agende Sua viagem
-            </button>
-            {scheduleState.error && (
-              <p className="schedule-error" role="alert">
-                Não foi possível carregar os horários: {scheduleState.error}
-              </p>
-            )}
-          </div>
+              <button
+                className="booking-cta"
+                type="button"
+                onClick={() => {
+                  setSelectedRouteKey(card.routeKey);
+                  setSelectedDate('');
+                  setDialogStep('date');
+                }}
+              >
+                Agende sua viagem
+              </button>
+              <div className="destination-card__text">
+                <span>{`${card.originPlace} / ${card.destinationPlace}`}</span>
+                <h1>{`${card.originPlace} e ${card.destinationPlace}`}</h1>
+              </div>
+            </article>
+          ))}
         </section>
       </main>
 
@@ -215,8 +279,10 @@ function ClientPage({ client }) {
                 }
 
                 const dateValue = toDateInputValue(date);
-                const hasTrips = scheduleState.config
-                  && getTripsForDate(client, dateValue).length > 0;
+                const tripsForDate = getTripsForDate(scheduleState.config, dateValue);
+                const hasTrips = tripsForDate.some((trip) => (
+                  selectedRouteKey === null || getRouteKey(trip.route) === selectedRouteKey
+                ));
                 const isDisabled = dateValue < minDate || dateValue > maxDate || !hasTrips;
                 const isSelected = dateValue === selectedDate;
 
@@ -243,7 +309,7 @@ function ClientPage({ client }) {
             <button
               className="button button--primary"
               type="submit"
-              disabled={!selectedDate || getTripsForDate(client, selectedDate).length === 0}
+              disabled={!selectedDate || !hasTripsForSelectedDate}
             >
               Ver viagens
             </button>
@@ -263,42 +329,52 @@ function ClientPage({ client }) {
 
         <div className="schedule-list">
           {tripGroups.map((group) => {
-            const groupTrips = group.trips.filter((trip) => trip.kind === group.kind);
+            const groupTrips = group.trips.filter((trip) => (
+              trip.kind === group.kind
+              && (selectedRouteKey === null || getRouteKey(trip.route) === selectedRouteKey)
+            ));
 
             if (groupTrips.length === 0) {
               return null;
             }
 
+            const tripItems = groupTrips.map((trip) => {
+              const [tripOrigin, tripDestination] = trip.route.split(' → ');
+
+              return (
+                <button
+                  className={`schedule-item schedule-item--selectable schedule-item--${trip.kind}`}
+                  key={`${trip.kind}-${trip.route}-${trip.departure}`}
+                  type="button"
+                  onClick={() => {
+                    setSelectedTrip(trip);
+                    setFormData((prev) => ({ ...prev, passageiros: '1' }));
+                    setShowBookingDetails(false);
+                    setDialogStep('booking');
+                  }}
+                >
+                  <span className="schedule-item__meta">
+                    <strong>Origem: {tripOrigin}</strong>
+                    <strong>Destino: {tripDestination}</strong>
+                    <span>Disponível para até {trip.capacity} passageiros</span>
+                  </span>
+
+                  <span className="schedule-item__time">
+                    <span className="time-badge">{trip.departure}</span>
+                    <span className="pill">{trip.price}</span>
+                  </span>
+                </button>
+              );
+            });
+
+            if (group.kind === 'weekly') {
+              return tripItems;
+            }
+
             return (
-              <section className="schedule-group" key={group.kind}>
+              <section className={`schedule-group schedule-group--${group.kind}`} key={group.kind}>
                 <h3>{group.title}</h3>
-                {groupTrips.map((trip) => {
-                  const [tripOrigin, tripDestination] = trip.route.split(' → ');
-
-                  return (
-                    <button
-                      className={`schedule-item schedule-item--selectable schedule-item--${trip.kind}`}
-                      key={`${trip.kind}-${trip.route}-${trip.departure}`}
-                      type="button"
-                      onClick={() => {
-                        setSelectedTrip(trip);
-                        setShowBookingDetails(false);
-                        setDialogStep('booking');
-                      }}
-                    >
-                      <span className="schedule-item__meta">
-                        <strong>Origem: {tripOrigin}</strong>
-                        <strong>Destino: {tripDestination}</strong>
-                        <span>Disponível para até {trip.capacity} passageiros</span>
-                      </span>
-
-                      <span className="schedule-item__time">
-                        <span className="time-badge">{trip.departure}</span>
-                        <span className="pill">{trip.price}</span>
-                      </span>
-                    </button>
-                  );
-                })}
+                {tripItems}
               </section>
             );
           })}
@@ -342,6 +418,7 @@ function ClientPage({ client }) {
             )}
 
             <form className="booking-form" onSubmit={handleSubmit}>
+              {bookingError && <p className="management-error" role="alert">{bookingError}</p>}
               <div className="form-row">
                 <label>
                   Nome
@@ -368,16 +445,38 @@ function ClientPage({ client }) {
                 </label>
               </div>
 
-              <label>
-                Passageiros
-                <select name="passageiros" value={formData.passageiros} onChange={handleChange}>
-                  {[...Array(Math.min(client.capacity, selectedTrip.capacity))].map((_, index) => (
-                    <option key={index + 1} value={String(index + 1)}>
-                      {index + 1}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <div className="passenger-field">
+                <span className="passenger-field__label" id="passenger-count-label">Passageiros</span>
+                <div className="passenger-control" aria-labelledby="passenger-count-label">
+                  <button
+                    className="passenger-control__button"
+                    type="button"
+                    aria-label="Diminuir passageiros"
+                    disabled={Number(formData.passageiros) <= 1}
+                    onClick={() => setFormData((prev) => ({
+                      ...prev,
+                      passageiros: String(Math.max(1, Number(prev.passageiros) - 1)),
+                    }))}
+                  >
+                    -
+                  </button>
+                  <output className="passenger-control__value" aria-live="polite">
+                    {formData.passageiros}
+                  </output>
+                  <button
+                    className="passenger-control__button"
+                    type="button"
+                    aria-label="Aumentar passageiros"
+                    disabled={Number(formData.passageiros) >= maxPassengers}
+                    onClick={() => setFormData((prev) => ({
+                      ...prev,
+                      passageiros: String(Math.min(maxPassengers, Number(prev.passageiros) + 1)),
+                    }))}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
 
               <label>
                 Observação
@@ -401,6 +500,9 @@ function ClientPage({ client }) {
           </>
         )}
       </dialog>
+      <footer className="client-page__footer">
+        developed Renan Cordeiro Ramos
+      </footer>
     </div>
   );
 }

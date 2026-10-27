@@ -403,6 +403,78 @@ img {
   padding: 34px 0 58px;
 }
 
+.client-page__footer {
+  padding: 18px 14px;
+  color: #000;
+  font-size: 1.02rem;
+  text-align: center;
+}
+
+.destination-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+  gap: 20px;
+}
+
+.destination-card {
+  position: relative;
+  min-height: 350px;
+  overflow: hidden;
+  border: 1px solid rgba(60, 60, 67, 0.16);
+  border-radius: 22px;
+  background-position: center;
+  background-size: cover;
+  box-shadow: var(--shadow);
+}
+
+.destination-card::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.04) 30%,
+    rgba(0, 0, 0, 0.32) 67%,
+    rgba(0, 0, 0, 0.62) 100%
+  );
+  content: "";
+}
+
+.destination-card .booking-cta {
+  min-height: 52px;
+  padding: 13px 18px;
+  border-radius: 16px;
+  font-size: 1rem;
+}
+
+.destination-card__text {
+  position: absolute;
+  z-index: 1;
+  right: 18px;
+  bottom: 17px;
+  left: 18px;
+  color: #fff;
+  pointer-events: none;
+}
+
+.destination-card__text span {
+  display: block;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.destination-card__text h1 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.5vw, 2rem);
+  font-weight: 750;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
 .client-page__hero {
   display: grid;
   grid-template-columns: 1fr;
@@ -612,10 +684,29 @@ button.calendar-day--selected:disabled {
 .schedule-group {
   display: grid;
   gap: 10px;
+  padding: 14px;
+  border: 1px solid #e2e2e7;
+  border-radius: 17px;
+  background: #f9f9fb;
+}
+
+.schedule-group--weekly {
+  border-color: var(--category-weekly-border);
+  background: var(--category-weekly-background);
+}
+
+.schedule-group--tour {
+  border-color: var(--category-tours-border);
+  background: var(--category-tours-background);
+}
+
+.schedule-group--special {
+  border-color: var(--category-special-border);
+  background: var(--category-special-background);
 }
 
 .schedule-group h3 {
-  margin: 6px 0 0;
+  margin: 0;
   color: #3a3a3c;
   font-size: 1rem;
   font-weight: 700;
@@ -728,6 +819,51 @@ label {
   color: #48484a;
   font-size: 0.9rem;
   font-weight: 600;
+}
+
+.passenger-field {
+  display: grid;
+  gap: 7px;
+  color: #48484a;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.passenger-control {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 46px;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #d1d1d6;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.passenger-control__button {
+  width: 48px;
+  min-height: 44px;
+  border: 0;
+  color: var(--primary);
+  background: transparent;
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.passenger-control__button:hover:not(:disabled) {
+  background: #f2f7ff;
+}
+
+.passenger-control__button:disabled {
+  color: #a1a1a6;
+  cursor: not-allowed;
+}
+
+.passenger-control__value {
+  min-width: 42px;
+  color: #1c1c1e;
+  text-align: center;
 }
 
 input,
@@ -935,6 +1071,102 @@ textarea {
   padding: 36px 0 60px;
 }
 
+.management-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.management-title .section-head {
+  margin-bottom: 0;
+}
+
+.management-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.management-shortcut {
+  display: grid;
+  min-height: 132px;
+  align-content: space-between;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid #e1e1e6;
+  border-radius: 18px;
+  color: var(--muted);
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.management-shortcut:hover {
+  transform: translateY(-2px);
+  border-color: #a9c5e8;
+  box-shadow: 0 8px 24px rgba(28, 28, 30, 0.08);
+}
+
+.management-shortcut:focus-visible {
+  outline: 3px solid rgba(0, 122, 255, 0.22);
+  outline-offset: 2px;
+}
+
+.management-shortcut:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.management-shortcut__title {
+  color: var(--text);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.management-registration-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.management-registration-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 0;
+  border-bottom: 1px solid #ececf0;
+}
+
+.management-registration-item > div:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.management-registration-item > div:first-child span,
+.management-expenses__summary {
+  color: var(--muted);
+}
+
+.management-registration-item__boat,
+.management-registration-item__hint {
+  flex-basis: 100%;
+  color: var(--muted);
+}
+
+.management-registration-item__hint {
+  font-size: 0.88rem;
+}
+
+.management-expenses__summary {
+  margin: 18px 0;
+  font-size: 1.1rem;
+  font-weight: 650;
+}
+
 .management-categories {
   display: grid;
   gap: 18px;
@@ -972,6 +1204,47 @@ textarea {
 .management-card.management-category--special {
   border-color: var(--category-special-border);
   background: var(--category-special-background);
+}
+
+.management-expenses {
+  display: grid;
+  gap: 18px;
+  border-color: #eadfcf;
+  background: linear-gradient(135deg, #fffaf2, #f7efe3);
+}
+
+.management-bookings {
+  display: grid;
+  gap: 14px;
+  border-color: #c9dce8;
+  background: linear-gradient(135deg, #f5fbff, #edf5fa);
+}
+
+.management-bookings .section-head {
+  margin-bottom: 0;
+}
+
+.management-bookings__note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.management-category__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.management-category__header .section-head {
+  margin-bottom: 0;
+}
+
+.management-expenses__total {
+  color: #6f4e37;
+  font-size: 1.15rem;
 }
 
 .management-category--weekly .section-head h2,
@@ -1082,6 +1355,21 @@ textarea {
   background: #fff;
 }
 
+.management-form .expense-recurring-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #3a3a3c;
+}
+
+.management-form .expense-recurring-option input {
+  width: 18px;
+  min-height: 18px;
+  flex: 0 0 auto;
+  margin: 2px 0 0;
+  accent-color: var(--primary);
+}
+
 .management-trip-list {
   display: grid;
   gap: 14px;
@@ -1154,6 +1442,19 @@ textarea {
   color: var(--muted);
 }
 
+.management-booking-customer {
+  display: grid;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 11px 12px;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.management-booking-customer span {
+  font-size: 0.9rem;
+}
+
 .management-saved-trip .button {
   justify-self: start;
 }
@@ -1164,7 +1465,7 @@ textarea {
 }
 
 .management-trip__settings {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .weekday-picker {
@@ -1732,6 +2033,29 @@ textarea {
 
   .management-category__actions .button {
     width: 100%;
+  }
+
+  .management-shortcuts {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .management-shortcut {
+    min-height: 100px;
+    padding: 18px;
+  }
+
+  .management-title {
+    align-items: flex-start;
+  }
+
+  .management-registration-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .management-registration-item .management-category__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .management-nav {

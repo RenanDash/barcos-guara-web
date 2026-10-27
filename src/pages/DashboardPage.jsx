@@ -1,5 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  EXPENSE_CATEGORIES,
+  getExpenses,
+  getExpenseOccurrences,
+} from '../data/expenseStorage';
 import demoReports from '../data/demoReports.json';
 
 const currency = new Intl.NumberFormat('pt-BR', {
@@ -34,6 +39,22 @@ function DashboardPage({ client }) {
   const report = demoReports[client.slug];
   const [startDate, setStartDate] = useState(report.daily[0].date);
   const [endDate, setEndDate] = useState(report.daily.at(-1).date);
+  const [expenseState, setExpenseState] = useState({ expenses: [], error: '', loading: true });
+
+  useEffect(() => {
+    let active = true;
+    getExpenses(client.slug)
+      .then((expenses) => {
+        if (active) setExpenseState({ expenses, error: '', loading: false });
+      })
+      .catch((error) => {
+        if (active) setExpenseState({ expenses: [], error: error.message, loading: false });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [client.slug]);
   const filteredDays = useMemo(
     () => report.daily.filter((day) => day.date >= startDate && day.date <= endDate),
     [report.daily, startDate, endDate],
@@ -51,20 +72,31 @@ function DashboardPage({ client }) {
     reservations: 0,
     occupancyTotal: 0,
   });
-  const netProfit = totals.grossRevenue - totals.operatingExpenses;
+  const expenseOccurrences = useMemo(
+    () => getExpenseOccurrences(expenseState.expenses, startDate, endDate),
+    [expenseState.expenses, startDate, endDate],
+  );
+  const loggedExpensesTotal = expenseOccurrences.reduce(
+    (total, expense) => total + expense.amount,
+    0,
+  );
+  const loggedExpensesByCategory = EXPENSE_CATEGORIES.map((category) => ({
+    label: category.label,
+    value: expenseOccurrences
+      .filter((expense) => expense.category === category.value)
+      .reduce((total, expense) => total + expense.amount, 0),
+  })).filter((category) => category.value > 0);
+  const maxLoggedExpense = Math.max(...loggedExpensesByCategory.map((item) => item.value), 0);
+  const netProfit = totals.grossRevenue - loggedExpensesTotal;
   const averageOccupancy = filteredDays.length
     ? totals.occupancyTotal / filteredDays.length
     : 0;
+  const demoNetProfit = totals.grossRevenue - totals.operatingExpenses;
   const periodShare = report.currentMonthToDate.netProfit
-    ? netProfit / report.currentMonthToDate.netProfit
+    ? demoNetProfit / report.currentMonthToDate.netProfit
     : 0;
   const scaled = (amount) => amount * periodShare;
-  const expenseTotal = report.expenses.reduce((total, expense) => total + expense.amount, 0);
   const tripTypeTotal = report.tripTypes.reduce((total, tripType) => total + tripType.reservations, 0);
-  const selectedExpenses = report.expenses.map((expense) => ({
-    label: expense.category,
-    value: scaled(expense.amount),
-  }));
   const selectedTripTypes = report.tripTypes.map((tripType) => ({
     label: tripType.category,
     value: scaled(tripType.revenue),
@@ -81,12 +113,18 @@ function DashboardPage({ client }) {
       ? totals.reservations / report.summary.reservations
       : 0)),
   }));
-  const maxExpense = Math.max(...selectedExpenses.map((item) => item.value), 0);
+  const maxExpense = maxLoggedExpense;
   const maxTripType = Math.max(...selectedTripTypes.map((item) => item.value), 0);
   const maxRoute = Math.max(...selectedRoutes.map((item) => item.value), 0);
   const maxStatus = Math.max(...selectedStatuses.map((item) => item.value), 0);
+  const expensesForDate = (date) => expenseOccurrences
+    .filter((expense) => expense.occurrenceDate === date)
+    .reduce((total, expense) => total + expense.amount, 0);
   const chartMax = Math.max(
-    ...filteredDays.flatMap((day) => [day.grossRevenue, day.operatingExpenses, day.grossRevenue - day.operatingExpenses]),
+    ...filteredDays.flatMap((day) => {
+      const dailyExpenses = expensesForDate(day.date);
+      return [day.grossRevenue, dailyExpenses, day.grossRevenue - dailyExpenses];
+    }),
     1,
   );
   const periodLabel = startDate && endDate
@@ -98,8 +136,8 @@ function DashboardPage({ client }) {
       <header className="topbar">
         <div className="container topbar__inner">
           <Link className="brand" to="/">
-            <span className="brand__mark">⚓</span>
-            <span>Barcos Guara</span>
+            <span className="brand__mark">⚓︎</span>
+            <span>Táxi Náutico</span>
           </Link>
           <nav className="nav management-nav">
             <Link to="/gerenciamento">Voltar ao gerenciamento</Link>
@@ -116,6 +154,12 @@ function DashboardPage({ client }) {
             <p>Indicadores e gráficos do período selecionado.</p>
           </div>
         </div>
+
+        {expenseState.error && (
+          <p className="management-error" role="alert">
+            Não foi possível carregar os gastos: {expenseState.error}
+          </p>
+        )}
 
         <section className="report-panel dashboard-filters">
           <div className="form-row">
@@ -158,14 +202,14 @@ function DashboardPage({ client }) {
             <small>{totals.reservations} reservas registradas no período</small>
           </article>
           <article className="report-metric report-metric--expenses">
-            <span>Custos operacionais</span>
-            <strong>{currency.format(totals.operatingExpenses)}</strong>
-            <small>Combustível, manutenção, taxas e outros</small>
+            <span>Gastos lançados</span>
+            <strong>{currency.format(loggedExpensesTotal)}</strong>
+            <small>Inclui ocorrências mensais dos gastos recorrentes</small>
           </article>
           <article className="report-metric report-metric--profit">
             <span>Lucro líquido estimado</span>
             <strong>{currency.format(netProfit)}</strong>
-            <small>Faturamento bruto menos custos operacionais</small>
+            <small>Faturamento demonstrativo menos gastos lançados</small>
           </article>
           <article className="report-metric report-metric--trips">
             <span>Viagens concluídas</span>
@@ -176,12 +220,43 @@ function DashboardPage({ client }) {
 
         <section className="report-panel">
           <div className="section-head">
+            <h2>Gastos lançados no período</h2>
+            <p>
+              Gastos registrados no banco de dados: {currency.format(loggedExpensesTotal)}.
+              {' '}Cada gasto recorrente entra uma vez por mês a partir da data cadastrada.
+            </p>
+          </div>
+          {expenseOccurrences.length === 0 ? (
+            <p className="dashboard-empty">Nenhum gasto lançado neste período.</p>
+          ) : (
+            <div className="report-list">
+              {expenseOccurrences.map((expense) => (
+                <div
+                  className="report-list__row"
+                  key={`${expense.id}-${expense.occurrenceDate}`}
+                >
+                  <span>
+                    {EXPENSE_CATEGORIES.find((category) => category.value === expense.category)?.label
+                      ?? expense.category}
+                    {' · '}{expense.description}
+                    {' · '}{formatDate(expense.occurrenceDate)}
+                    {expense.recurring ? ' · recorrente' : ''}
+                  </span>
+                  <strong>{currency.format(expense.amount)}</strong>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="report-panel">
+          <div className="section-head">
             <h2>Faturamento, custos e lucro por dia</h2>
             <p>Valores diários dentro do período selecionado.</p>
           </div>
           <div className="dashboard-legend">
             <span><i className="dashboard-legend__revenue" />Faturamento</span>
-            <span><i className="dashboard-legend__expenses" />Custos</span>
+            <span><i className="dashboard-legend__expenses" />Gastos lançados</span>
             <span><i className="dashboard-legend__profit" />Lucro líquido</span>
           </div>
           {filteredDays.length === 0 ? (
@@ -189,12 +264,13 @@ function DashboardPage({ client }) {
           ) : (
             <div className="dashboard-bar-chart">
               {filteredDays.map((day) => {
-                const dailyProfit = day.grossRevenue - day.operatingExpenses;
+                const dailyExpenses = expensesForDate(day.date);
+                const dailyProfit = day.grossRevenue - dailyExpenses;
                 return (
                   <div className="dashboard-bar-chart__group" key={day.date} title={formatDate(day.date)}>
                     <div className="dashboard-bar-chart__bars">
                       <span className="dashboard-bar dashboard-bar--revenue" style={{ height: `${(day.grossRevenue / chartMax) * 100}%` }} />
-                      <span className="dashboard-bar dashboard-bar--expenses" style={{ height: `${(day.operatingExpenses / chartMax) * 100}%` }} />
+                      <span className="dashboard-bar dashboard-bar--expenses" style={{ height: `${(dailyExpenses / chartMax) * 100}%` }} />
                       <span className="dashboard-bar dashboard-bar--profit" style={{ height: `${(dailyProfit / chartMax) * 100}%` }} />
                     </div>
                     <span>{formatDate(day.date)}</span>
@@ -209,14 +285,18 @@ function DashboardPage({ client }) {
         <div className="reports-grid">
           <section className="report-panel">
             <div className="section-head">
-              <h2>Despesas por categoria</h2>
-              <p>Estimativa no período: {currency.format(scaled(expenseTotal))}</p>
+              <h2>Gastos por categoria</h2>
+              <p>Gastos lançados no período: {currency.format(loggedExpensesTotal)}</p>
             </div>
-            <BreakdownChart
-              items={selectedExpenses}
-              maxValue={maxExpense}
-              formatValue={currency.format}
-            />
+            {loggedExpensesByCategory.length === 0 ? (
+              <p className="dashboard-empty">Nenhum gasto lançado neste período.</p>
+            ) : (
+              <BreakdownChart
+                items={loggedExpensesByCategory}
+                maxValue={maxExpense}
+                formatValue={currency.format}
+              />
+            )}
           </section>
 
           <section className="report-panel">
@@ -251,7 +331,7 @@ function DashboardPage({ client }) {
 
           <section className="report-panel">
             <div className="section-head">
-              <h2>Status das reservas</h2>
+              <h2>Situação das reservas</h2>
               <p>{totals.reservations} reservas no total.</p>
             </div>
             <BreakdownChart
@@ -264,7 +344,7 @@ function DashboardPage({ client }) {
             />
             <div className="report-list">
               <div className="report-list__row">
-                <span>Ticket médio</span>
+                <span>Valor médio por reserva</span>
                 <strong>{currency.format(totals.reservations ? totals.grossRevenue / totals.reservations : 0)}</strong>
               </div>
             </div>
@@ -278,8 +358,8 @@ function DashboardPage({ client }) {
             com lucro líquido estimado de {currency.format(netProfit)}.
           </p>
           <small>
-            O lucro líquido estimado é calculado como faturamento bruto menos custos operacionais.
-            Os detalhamentos por categoria são exemplos proporcionais e não representam dados reais.
+            O faturamento e os demais indicadores da operação são dados de demonstração.
+            Os gastos lançados são registros deste navegador; cada recorrência conta uma vez por mês.
           </small>
         </aside>
       </main>

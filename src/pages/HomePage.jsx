@@ -1,20 +1,19 @@
 import { Link } from 'react-router-dom';
-import clients from '../data/clients.json';
 
-function HomePage() {
+function HomePage({ clients }) {
   return (
     <div className="app-shell">
       <header className="topbar">
         <div className="container topbar__inner">
           <div className="brand">
-            <div className="brand__mark">⚓</div>
-            <span>Barcos Guara</span>
+            <div className="brand__mark">⚓︎</div>
+            <span>Táxi Náutico</span>
           </div>
           <nav className="nav">
             <Link to="/">Início</Link>
-            <Link to="/cliente1">Cliente 1</Link>
-            <Link to="/cliente2">Cliente 2</Link>
-            <Link to="/cliente3">Cliente 3</Link>
+            {clients.map((client) => (
+              <Link to={`/${client.slug}`} key={client.slug}>{client.name}</Link>
+            ))}
           </nav>
         </div>
       </header>
@@ -79,7 +78,7 @@ function HomePage() {
               <article className="card">
                 <div className="card__icon">03</div>
                 <h3>Pagamento por Pix</h3>
-                <p>Receba o QR Code do Pix e finalize a reserva com segurança e rapidez.</p>
+                <p>Receba o código QR do Pix e finalize a reserva com segurança e rapidez.</p>
               </article>
             </div>
           </div>
